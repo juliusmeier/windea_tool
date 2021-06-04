@@ -14,7 +14,7 @@ setup(
     # Needed to actually package something
     packages=['windea_tool'],  # directory containing __init__.py
     # Needed for dependencies
-    install_requires=['pandas'],
+    install_requires=['pandas',],
 
     author='Julius Meier',
 )

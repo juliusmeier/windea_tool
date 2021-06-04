@@ -1,58 +1,69 @@
-import math
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-from windea_tool import test
-# pkg: pandas, numpy, matplotlib, openpyxl, setuptools
+from windea_tool import main
+from windea_tool import plotting
+from windea_tool import weibull
+# pkg: pandas, numpy, matplotlib, openpyxl, xlsxwriter ,setuptools,
 # $ pip install git+https://github.com/<github username>/roman
-test.print_hello()
-
-# hier mit optional arguments, damit eine Funktion für k,A und k,v_m
-def weibull(k,v_m, v_i):
-    A = 2/math.sqrt(math.pi) * v_m
-    print(A)
-    print(type(v_i))
-    h_i = k/A * (v_i/A)**(k-1) * np.exp(-(v_i/A)**k)
-    return h_i
-
-v_i = np.arange(0, 35, 1)
-#print(v_i)
-
-
-w= weibull(2,10,v_i)
-#print(type(w), w)
-
-df = pd.DataFrame(index=v_i)
-df["h_i"] = w
-#print(df)
-#df.plot()
-#plt.show()
-
-def windprofil(h_i, v_r, h_r, z_0 ):
-    v_i = v_r * (np.log(h_i/z_0) / np.log(h_r/z_0))
-    return v_i
-
-h_i = np.arange(10, 160, 10)
-v = windprofil(h_i=h_i, v_r=5, h_r=10, z_0=0.1)
-df2 = pd.DataFrame({'h':h_i})
-df2['v']= v
-#print(df2)
-#df2.plot(x='v', y='h')
-#plt.show()
-
 #pip install openpyxl
 # set engine parameter to "openpyxl"pd.read_excel(path, engine = 'openpyxl')
-en33 = pd.read_excel("../windea_tool/data/Enercon_E-33.xlsx", engine = 'openpyxl')
-#print(type(en33))
-#print(en33)
 
+# 2 Turbinen vergleichen!! Default darstellung von main und customize zulassen
+
+#w = weibull(v, k=2, v_m=10) # [k,v_m]
+#w = weibull(v,v_m=10)       # [k=2,v_m]
+#w = weibull(v, A=11, k=1.5) # [A,k]
+
+
+"""
+df, df_detailed = weibull.weibull_windhistogramm(k=2, v_m=10)
+
+en = main.load_turbine('Enercon E-115 (3000 kW)')
+en2 = main.load_turbine('Enercon E-33 (330 kW)')
+
+
+main.ertrag(df, en)
+
+fig_list = []
+fig_list.append(plotting.plot_weibull(df_detailed))
+fig_list.append(plotting.plot_turbine(en, en2))
+fig_list.append(plotting.plot_main(df))
+fig_list.append(plotting.plot_ertrag(df, ylabel="Windenergieertrag in GWh",
+                                   title="Ertragsverteilung in GWh", color="blue"))
+fig_list.append(plotting.plot_ertrag_h(df))
+
+#print(fig_list[0].axes[0].get_title())
+#print(fig_list[0].texts[0].get_text())
+
+#main.save_plots(fig_list=fig_list)
+#main.save_data(en)
+#plt.show()
+"""
+
+r = main.Windea()
+print(r.df_main)
+#r.add_turbine("Enercon E-33 (330 kW)")
+r.add_turbine("Enercon E-115 (3000 kW)")
+print(r.df_turbine)
+r.windhistogramm(k=2, v_m=10)
+print(r.df_weibull)
+r.ertrag()
+print(r.df_main)
+r.plot_all()
+r.save_plots()
+
+#r.save_data()
+
+#plt.show()
+
+
+"""
+# Windmessung mit Stufendiagramm
 wd = pd.read_excel("../windea_tool/data/wind_dist.xlsx", engine = 'openpyxl')
 #print(wd)
 y = wd['Frequency']
+#plt.stairs(values = [1,2,3,2,1], edges = [0,1,2,3,4,5])
+#plt.show()
+"""
 
-plt.stairs(values = [1,2,3,2,1], edges = [0,1,2,3,4,5])
-plt.show()
 
-def load_turbine():
-    return pd.read_excel('data/Enercon_E-33.xlsx', engine = 'openpyxl')
 
