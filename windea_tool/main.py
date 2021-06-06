@@ -75,18 +75,23 @@ class Windea:
         self.df_weibull, self.df_weibull_detailed = weibull.weibull_windhistogramm(A=A, k=k, v_m=v_m)
         # weibull oder messung
 
-    def plot_analysis(self, analysis, selected_plots=None):
+    def plot(self, analysis, selected_plots=["windhistogramm", "turbine", "main", "ertrag", "ertrag_h"]):
         A = self.analysis_container[analysis]
         fig_list = []
 
-        fig_list.append(plotting.plot_weibull(A.locations))
-        fig_list.append(plotting.plot_turbine(A.turbines))
-        #for turb in A.turbines.values():
-        #    fig_list.append(plotting.plot_main(turb))
-        for loc in A.locations.values():
-            fig_list.append(plotting.plot_main(loc))
-        #fig_list.append(plotting.plot_ertrag(A.turbines))
-        #fig_list.append(plotting.plot_ertrag_h(A.turbines))
+        if "windhistogramm" in selected_plots:
+            fig_list.append(plotting.plot_weibull(A.locations))
+        if "turbine" in selected_plots:
+            fig_list.append(plotting.plot_turbine(A.turbines))
+        if "main" in selected_plots:
+            for turb in A.turbines.values():
+                fig_list.append(plotting.plot_main(turb))
+            #for loc in A.locations.values():
+            #    fig_list.append(plotting.plot_main(loc))
+        if "ertrag" in selected_plots:
+            fig_list.append(plotting.plot_ertrag(A.turbines))
+        if "ertrag_h" in selected_plots:
+            fig_list.append(plotting.plot_ertrag_h(A.turbines))
 
 
     def save_plots(self, path=""):

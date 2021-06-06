@@ -72,7 +72,7 @@ def plot_main(turbine):
     ax.legend(loc="upper left")
     ax2.legend(loc="upper right")
 
-    #fig.suptitle(turbine.turbine_name, fontsize=20)
+    fig.suptitle(turbine.turbine_name, fontsize=20)
     return fig
 
 def plot_ertrag(turbines_container, figsize=None): #https://stackoverflow.com/questions/54714018/horizontal-grid-only-in-python-using-pandas-plot-pyplot
