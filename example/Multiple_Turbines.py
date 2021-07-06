@@ -9,15 +9,18 @@ r.add_location(k=2, v_m=10, delta_v = 1,
                h_r = 10, h = 10, type_windprofil = "logarithmisch", v_r = 5, z_0 = 2,
                name="Berlin", type="weibull")
 
-# Windprofil
-#r.add_windprofil(location="Dresden", start=0, stop=160, step=10,
-                #type='logarithmisch', v_r=5, h_r=10, z_0=0.3)
-                #type="hellmann", v_r=5, h_r=10, a = 0.25)
+# rho, verfügbarkeit
+# turbine importieren, interne Datenbank
+# weibull(A,k,v_m), messung importieren
+# Windprofil: logarithmisch, hellmann: h_r, v_r, z_0/a, h
+    # delta_v, start, stop, step
+# flautenanalyse = True
+# show=True, selected_plots
 
 
 
-r.analyse()
+r.analyse(flautenanalyse=True)
 
-r.plot(show=False)
+r.plot(show=True)
 
 r.save()

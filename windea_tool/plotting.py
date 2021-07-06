@@ -1,34 +1,39 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# besser: colors_dict mit y-Wert als key
 colors_dict = {"blue": '#1f77b4', "orange": '#ff7f0e', "green": '#2ca02c', "red": '#d62728',
                "purple": '#9467bd', "brown": '#8c564b', "magenta": '#e377c2', "grey": '#7f7f7f',
                "yellow": '#bcbd22', "cyan": '#17becf',}
 
-formatting = {"title_size": 20, "labelsize": 14,} # marker, figsize
+#formatting = {"title_size": 20, "labelsize": 14,}
 
 def plot_weibull(location_dict, display_parameters = True):
+    weibull = False
     fig, ax = plt.subplots(figsize=(12,6))
     for loc in location_dict.values():
-        parameters = ""
-        # get Weibull Parameters
-        if display_parameters:
-            loc.A = 10
-            parameters = "\nA: " + str(loc.A) + ", k: " + str(loc.k) + ", v_m: " + str(loc.v_m)
+        if loc.df_weibull is not None:
+            weibull = True
+            parameters = ""
+            # get Weibull Parameters
+            if display_parameters:
+                loc.A = 10
+                parameters = "\nA: " + str(loc.A) + ", k: " + str(loc.k) + ", v_m: " + str(loc.v_m)
 
-        loc.df_weibull_detailed.plot(x='v', y="h_detailed", ax=ax,
-                                     label = loc.name + parameters)
+            loc.df_weibull_detailed.plot(x='v', y="h_detailed", ax=ax,
+                                         label = loc.name + parameters)
 
-    ax.set_xlabel("Windgeschwindigkeit in m/s")
-    ax.set_ylabel("Relative Häufigkeit")
-    ax.set_xlim(left=0)
-    ax.set_ylim(bottom=0)
+            ax.set_xlabel("Windgeschwindigkeit in m/s")
+            ax.set_ylabel("Relative Häufigkeit")
+            ax.set_xlim(left=0)
+            ax.set_ylim(bottom=0)
 
-    ax.grid()
-    fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit", fontsize=20)
-
-    return fig
+            ax.grid()
+            fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit", fontsize=20)
+    if weibull:
+        return fig
+    else:
+        plt.close(fig)
+        return None
 
 def plot_turbine(turbines_container):
     fig, ax = plt.subplots(figsize=(12,6))
@@ -68,12 +73,9 @@ def plot_main(turb_loc):
 
 def plot_ertrag(turbines_container): #https://stackoverflow.com/questions/54714018/horizontal-grid-only-in-python-using-pandas-plot-pyplot
     fig, ax = plt.subplots(figsize=(12,6))
-    colors=["blue", "green"]
+    colors=["blue", "green", "purple", "cyan"]
     i=0
-    #for turb in turbines_container.values():
-    #    turb.df_main.plot(x='v', y='E', ax=ax, kind='bar', color=colors[i], alpha=0.5,
-    #                      xlabel="Windgeschwindigkeit in m/s" , ylabel="Windenergieertrag in GWh",
-    #                      label=turb.name)
+
     df = pd.DataFrame()
     for turb, turb_obj in turbines_container.items():
         df[turb] = turb_obj.df_main['E']
@@ -89,7 +91,7 @@ def plot_ertrag(turbines_container): #https://stackoverflow.com/questions/547140
 
 def plot_ertrag_h(turbines_container, marker="o"):
     fig, ax = plt.subplots(figsize=(12,6))
-    colors = ["blue", "green"]
+    colors = ["blue", "green", "purple", "cyan"]
     i=0
     for turb in turbines_container.values():
         turb.df_main.plot(x='v', y='E_h', ax=ax, kind='line', marker=marker, color=colors[i],
@@ -123,27 +125,46 @@ def plot_windprofil(location):
 
 
 def plot_messung(location_dict):
+    messung = False
     fig, ax = plt.subplots(figsize=(12, 6))
     for loc in location_dict.values():
-        edges = loc.df_messung['from']
-        # get last value from the "to" column
-        last = loc.df_messung.loc[loc.df_messung.index[-1], 'to']
-        last = pd.Series(last)
-        # append last to edges to obey len(edges) == len(values) + 1
-        edges = edges.append(last, ignore_index=True)
-        # plt.stairs(values = [1,2,3,2,1], edges = [0,1,2,3,4,5])
-        plt.stairs(values=loc.df_messung['Frequency'], edges=edges, label="Messung")
+        if loc.df_messung is not None:
+            messung = True
+            edges = loc.df_messung['from']
+            # get last value from the "to" column
+            last = loc.df_messung.loc[loc.df_messung.index[-1], 'to']
+            last = pd.Series(last)
+            # append last to edges to obey len(edges) == len(values) + 1
+            edges = edges.append(last, ignore_index=True)
+            # plt.stairs(values = [1,2,3,2,1], edges = [0,1,2,3,4,5])
+            plt.stairs(values=loc.df_messung['Frequency'], edges=edges, label="Messung " + loc.name,
+                       color = colors_dict["orange"])
 
-        # lineplot
-        loc.df_histogramm.plot(x="v", y="h", ax=ax)
+            # lineplot
+            loc.df_histogramm.plot(x="v", y="h", ax=ax, color=colors_dict["blue"])
 
-    ax.set_xlabel("Windgeschwindigkeit in m/s")
-    ax.set_ylabel("Relative Häufigkeit")
-    ax.set_xlim(left=0)
+            ax.set_xlabel("Windgeschwindigkeit in m/s")
+            ax.set_ylabel("Relative Häufigkeit")
+            ax.set_xlim(left=0)
+            ax.set_ylim(bottom=0)
+
+            plt.legend()
+            ax.grid()
+            fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit " + loc.name, fontsize=20)
+    if messung:
+        return fig
+    else:
+        plt.close(fig)
+        return None
+
+def plot_flaute(obj_container):
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for name, obj in obj_container.items():
+        ax.bar(x = obj.name, height = obj.flaute)
+
+    ax.set_ylabel("Anzahl der Stunden mit Flaute")
     ax.set_ylim(bottom=0)
 
-    plt.legend()
-    ax.grid()
-    fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit", fontsize=20)
+    fig.suptitle("Flautenanalyse", fontsize=20)
 
     return fig

@@ -18,9 +18,6 @@ class Windea:
         self.analysis_container = {}
         self.name = name
         self.df_main = {}
-        #v = np.arange(start, stop + step, step)
-        #self.v = v
-        #self.df_main = pd.DataFrame(index=v)
 
 
     def add_turbine(self, name, rho = 1.225, verfügbarkeit = 1, path=""):
@@ -113,20 +110,30 @@ class Windea:
 
 
     def flautenanalyse(self, obj):
-        first_non_zero = obj.df_main["E"].ne(0).idxmax()
-        h_sum = obj.df_main["h"].iloc[0:first_non_zero].sum()
-        print("Anzahl der Stunden mit Flaute: ", round(h_sum * 8760,2))
-        obj.flaute = h_sum * 8760
+        first_non_zero = obj.df_main["P"].ne(0).idxmax()
+        h_sum_flaute = obj.df_main["h"].iloc[0:first_non_zero].sum()
+        print("Anzahl der Stunden mit Flaute "+obj.name+": ", round(h_sum_flaute * 8760,2))
+        obj.flaute = h_sum_flaute * 8760
 
+        #last_non_zero = obj.df_main["P"][obj.df_main["P"] != 0].index[-1]
+        #h_sum_sturm = obj.df_main["h"].iloc[last_non_zero:-1].sum()
+        #print("Anzahl der Stunden mit Sturmabschaltung: ", round(h_sum_sturm * 8760, 2))
 
-    def plot(self, selected_plots=["weibull", "messung", "turbine", "main", "ertrag", "ertrag_h", "windprofil"],
+        #h_sum_betrieb = obj.df_main["h"].iloc[first_non_zero:last_non_zero].sum()
+        #print("Betriebsstunden: ", round(h_sum_betrieb * 8760, 2))
+        #print(obj.df_main["h"].sum())
+
+    def plot(self, selected_plots=["windhistogramm", "turbine", "main", "ertrag", "ertrag_h", "windprofil", "flautenanalyse"],
              show=True):
-        #A = self.analysis_container[analysis]
         fig_list = []
 
+        if "flautenanalyse" in selected_plots:
+            if list(self.locations_container.values())[0].flaute is not None:
+                fig_list.append(plotting.plot_flaute(self.locations_container))
+            elif list(self.turbines_container.values())[0].flaute is not None:
+                fig_list.append(plotting.plot_flaute(self.turbines_container))
         if "windhistogramm" in selected_plots:
             fig_list.append(plotting.plot_weibull(self.locations_container))
-        if "messung" in selected_plots:
             fig_list.append(plotting.plot_messung(self.locations_container))
         if "turbine" in selected_plots:
             fig_list.append(plotting.plot_turbine(self.turbines_container))
@@ -153,6 +160,7 @@ class Windea:
                     continue
                 fig_list.append(plotting.plot_windprofil(loc))
 
+        fig_list = filter(None, fig_list)
         self.fig_list = fig_list
 
         if show:
@@ -194,7 +202,6 @@ class Windea:
             os.makedirs(plots_dir)
         for fig in self.fig_list:
             fig.savefig(os.path.join(plots_dir, fig.texts[0].get_text() + ".png"))
-            # .pdf?
 
     def save_data(self, path=""):
         Excelwriter = pd.ExcelWriter(os.path.join(path,self.name)+".xlsx", engine="xlsxwriter")
@@ -220,6 +227,7 @@ class Turbine:
         self.df_turbine["rho"] *= rho
         self.rho = rho
         self.verfügbarkeit = verfügbarkeit
+        self.flaute = None
 
 
 class Location:
@@ -233,6 +241,9 @@ class Location:
         self.delta_v = delta_v
         self.type = type
         self.df_windprofil = None
+        self.df_messung = None
+        self.df_weibull = None
+        self.flaute = None
         # weibull oder messung
         if type == "weibull":
             self.df_weibull, self.df_weibull_detailed = weibull.weibull_windhistogramm(A=A, k=k, v_m=v_m, step = delta_v)
@@ -256,10 +267,6 @@ class Location:
             first_row = pd.DataFrame({"v":[0], "h":[0]})
             self.df_histogramm = pd.concat([first_row, self.df_histogramm], ignore_index=True)
 
-
-    #def windhistogramm(self, A=None, k=None, v_m=None):
-    #    self.df_weibull, self.df_weibull_detailed = weibull.weibull_windhistogramm(step = delta_v, A=A, k=k, v_m=v_m)
-        # weibull oder messung
 
     def windprofil(self, start, stop, step, type, v_r, h_r, z_0 = None, a = None):
         df_windprofil = pd.DataFrame()

@@ -2,9 +2,6 @@ import math
 import numpy as np
 import pandas as pd
 
-# move to Location class and always set all Parameters (show all in plot)
-
-# hier mit optional arguments, damit eine Funktion für k,A und k,v_m
 def weibull(v, A=None, k=2, v_m=None):
     if A is None:
         A = 2/math.sqrt(math.pi) * v_m
