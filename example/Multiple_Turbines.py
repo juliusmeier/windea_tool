@@ -2,12 +2,15 @@ from windea_tool import main
 
 r = main.Windea(name="Multiple Turbines")
 
-r.add_turbine("Enercon E-115 (3000 kW)", rho=1.225)
+r.add_turbine("Enercon E-115 (3000 kW)", rho=1.225, verfügbarkeit = 0.99)
 r.add_turbine("Enercon E-70 (2300 kW)", rho=1.225, verfügbarkeit = 0.97)
 
-r.add_location(k=2, v_m=10, delta_v = 1,
-               h_r = 10, h = 10, type_windprofil = "logarithmisch", v_r = 5, z_0 = 2,
-               name="Berlin", type="weibull")
+r.add_location(name="Berlin", type="weibull",
+               k=2, v_m=10, delta_v = 1,
+               type_windprofil = "logarithmisch", h_r = 10, v_r = 5, z_0 = 2, h = 10
+               )
+# Turbinen müssen gleiche Hubheight haben
+# windprofil funktioniert nur für weibull
 
 # rho, verfügbarkeit
 # turbine importieren, interne Datenbank
@@ -17,10 +20,8 @@ r.add_location(k=2, v_m=10, delta_v = 1,
 # flautenanalyse = True
 # show=True, selected_plots
 
+r.analyse(flautenanalyse = False)
 
-
-r.analyse(flautenanalyse=True)
-
-r.plot(show=True)
+r.plot(show = False)
 
 r.save()

@@ -1,17 +1,14 @@
 from windea_tool import main
 
-r = main.Windea(name="Multiple Locations")
+a = main.Windea(name="Multiple Locations")
 
-r.add_turbine("Enercon E-115 (3000 kW)", rho=1.225)
+a.add_turbine("Enercon E-115 (3000 kW)", rho=1.225)
 
+a.add_location(name="Berlin", type="messung", path = r"C:\Users\meinm\Documents\Git\windea-tool\example\windmessung_template.xlsx")
+a.add_location(k=3, v_m=8, name="Dresden", type="weibull")
 
-r.add_location(name="Berlin", type="messung", path = r"C:\Users\meinm\Documents\Git\windea-tool\example\windmessung.xlsx")
-r.add_location(k=3, v_m=8, name="Dresden", type="weibull")
+a.analyse()
 
+a.plot(show=True)
 
-r.analyse(flautenanalyse = True)
-
-r.plot(show=True, selected_plots=["flautenanalyse"])
-
-r.save()
-
+a.save()

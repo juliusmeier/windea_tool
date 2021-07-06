@@ -34,14 +34,20 @@ class Windea:
         if type_windprofil is not None:
             self.add_windprofil(location=name, start=start, stop=stop, step=step,
                                 type=type_windprofil, v_r=v_r, h_r=h_r, z_0=z_0, a=a)
+            df_windprofil = self.locations_container[name].df_windprofil
+            df_wp_detailed = self.locations_container[name].df_wp_detailed
             v_h = self.get_v_in_h(name, h=h)
 
             new_location = Location(name, delta_v = delta_v, A=A, k=k, v_m=v_h, type=type, path=path)
+            new_location.df_windprofil = df_windprofil
+            new_location.df_wp_detailed = df_wp_detailed
+            new_location.windprofil_type = type_windprofil
             self.locations_container[name] = new_location
 
     def add_windprofil(self, location, start, stop, step, type, v_r, h_r, z_0 = None, a = None):
         self.locations_container[location].windprofil(start=start, stop=stop, step=step,
                                                       type=type, v_r=v_r, h_r=h_r, z_0=z_0, a=a)
+
 
     def get_v_in_h(self, location, h):
         return self.locations_container[location].df_windprofil.query("h==" + str(h))["v"].values[0]
@@ -67,6 +73,9 @@ class Windea:
                 # perform calculations of energy yield
                 df_main['E'] = df_main['h'] * df_main['P'] * 8760 / 1000 ** 2 * turb_obj.verfügbarkeit # GWh
                 df_main['E_h'] = df_main['E'] / df_main['E'].sum()
+                df_main['E_sum'] = ''
+                df_main.loc[0, 'E_sum'] = df_main['E'].sum()
+                print("Prognose gesamter Energieertrag pro Jahr in GWh: ", df_main['E'].sum())
                 # add rho to data output
                 df_main["rho"] = turb_obj.df_turbine["rho"]
                 # assign df_main to object
@@ -96,6 +105,9 @@ class Windea:
                 # perform calculations of energy yield
                 df_main['E'] = df_main['h'] * df_main['P'] * 8760 / 1000 ** 2 * turb_obj.verfügbarkeit # GWh
                 df_main['E_h'] = df_main['E'] / df_main['E'].sum()
+                df_main['E_sum'] = ''
+                df_main.loc[0, 'E_sum'] = df_main['E'].sum()
+                print("Prognose gesamter Energieertrag pro Jahr in GWh: ", df_main['E'].sum())
                 # assign df_main to object
                 loc_obj.df_main = df_main
                 # Flautenanalyse
@@ -155,10 +167,9 @@ class Windea:
             if len(self.locations_container) > 1:
                 fig_list.append(plotting.plot_ertrag_h(self.locations_container))
         if "windprofil" in selected_plots:
-            for loc in self.locations_container.values():
-                if loc.df_windprofil is None:
-                    continue
-                fig_list.append(plotting.plot_windprofil(loc))
+            for loc, loc_obj in self.locations_container.items():
+                if loc_obj.df_windprofil is not None:
+                    fig_list.append(plotting.plot_windprofil(loc_obj))
 
         fig_list = filter(None, fig_list)
         self.fig_list = fig_list

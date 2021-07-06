@@ -119,7 +119,7 @@ def plot_windprofil(location):
     plt.ylabel("Höhe in m", fontsize=14)
 
     plt.legend()
-    fig.suptitle(location.windprofil_type + ": " + location.name, fontsize=20)
+    fig.suptitle(location.name + " Windprofil " + location.windprofil_type, fontsize=20)
     
     return fig
 
