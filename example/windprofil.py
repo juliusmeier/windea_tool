@@ -37,20 +37,27 @@ def windprofil(start, stop, step, type, v_r, h_r, z_0 = None, a = None):
 
 
 df_windprofil, df_wp_detailed = windprofil(start=0, stop=160, step=10,
-                                           type='logarithmisch',
-                                           v_r=5, h_r=10, z_0=0.3, a = 0.25)
+                                           #type='logarithmisch', v_r=5, h_r=10, z_0=0.3,
+                                           type="hellmann", v_r=5, h_r=10, a = 0.25)
 
-ax = df_windprofil.plot(x='v', y='h', title="Logarithmisches Windprofil",kind="scatter",
-                        marker="o", edgecolor="r", color="none")
-ax.grid()
 
-ax.plot(df_wp_detailed['v_detailed'],df_wp_detailed['h_detailed'])
+def plot_windprofil(df_windprofil, df_wp_detailed):
+    ax = df_windprofil.plot(x='v', y='h', title="Logarithmisches Windprofil",kind="scatter",
+                            marker="o", edgecolor="r", color="none")
+    ax.grid()
 
-plt.xlim(left=0)
-plt.ylim(bottom=0)
-plt.xlabel("Windgeschwindigkeit in m/s")
-plt.ylabel("Höhe in m")
-plt.show()
+    ax.plot(df_wp_detailed['v_detailed'],df_wp_detailed['h_detailed'])
 
+    plt.xlim(left=0)
+    plt.ylim(bottom=0)
+    plt.xlabel("Windgeschwindigkeit in m/s")
+    plt.ylabel("Höhe in m")
+    plt.show()
+
+#plot_windprofil(df_windprofil, df_wp_detailed)
 
 print(df_windprofil)
+
+h=10
+x = df_windprofil.query("h=="+str(h))["v"]
+print(x.values[0])
