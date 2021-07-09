@@ -9,6 +9,6 @@ case_study.add_location(name="Berlin", type="weibull", k=2.04, A=6.66)
 
 case_study.analyse()
 
-case_study.plot(show=True)
+case_study.plot(show=True, selected_plots=["windhistogramm"])
 
-case_study.save()
+#case_study.save()

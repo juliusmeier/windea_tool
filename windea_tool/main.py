@@ -257,7 +257,7 @@ class Location:
         self.flaute = None
         # weibull oder messung
         if type == "weibull":
-            self.df_weibull, self.df_weibull_detailed = weibull.weibull_windhistogramm(A=A, k=k, v_m=v_m, step = delta_v)
+            self.df_weibull, self.df_weibull_detailed, self.A, self.v_m = weibull.weibull_windhistogramm(A=A, k=k, v_m=v_m, step = delta_v)
             self.df_histogramm = self.df_weibull
         if type == "messung":
             self.df_messung = pd.read_excel(path, engine = 'openpyxl')
