@@ -16,7 +16,7 @@ def plot_weibull(location_dict, display_parameters = True):
             parameters = ""
             # get Weibull Parameters
             if display_parameters:
-                loc.A = 10
+                #loc.A = 10
                 parameters = "\nA: " + str(loc.A) + ", k: " + str(loc.k) + ", v_m: " + str(loc.v_m)
 
             loc.df_weibull_detailed.plot(x='v', y="h_detailed", ax=ax,
