@@ -28,7 +28,7 @@ def plot_weibull(location_dict, display_parameters = True):
             ax.set_ylim(bottom=0)
 
             ax.grid()
-            fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit", fontsize=20)
+            fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit (" + loc.type + ")", fontsize=20)
     if weibull:
         return fig
     else:
@@ -150,7 +150,7 @@ def plot_messung(location_dict):
 
             plt.legend()
             ax.grid()
-            fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit " + loc.name, fontsize=20)
+            fig.suptitle("Häufigkeitsverteilung der Windgeschwindigkeit (" + loc.type + ")", fontsize=20)
     if messung:
         return fig
     else:

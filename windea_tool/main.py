@@ -240,7 +240,6 @@ class Turbine:
         self.verfügbarkeit = verfügbarkeit
         self.flaute = None
 
-
 class Location:
 
     def __init__(self, name, delta_v = 1, A=None, k=None, v_m=None, type=None, path=""):
